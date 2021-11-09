@@ -80,3 +80,52 @@ fun testTimerObservable() {
     Thread.sleep(5500L)
 }
 
+/* map */
+fun testMapOperator() {
+    val namesObservable = Observable.just("John", "James", "Joseph", "Kelly")
+        .map {
+            it + "님"
+        }
+
+    namesObservable.subscribe { println(it) }
+
+
+    val nameLengthObservable = Observable.just("John", "James", "Joseph", "Kelly")
+        .map {
+            it.length
+        }
+
+    nameLengthObservable.subscribe { println(it) }
+}
+
+/* flatMap */
+fun testFlatMapOperator() {
+    val typeObservable = Observable.just("185cm", "180cm", "175cm", "170cm")
+        .flatMap { height ->
+            Observable.just("$height 남", "$height 여")
+        }
+
+    typeObservable.subscribe { println(it) }
+}
+
+/* buffer */
+fun testBuffer() {
+    val rangeObservable = Observable.range(1, 10)
+        .buffer(3)
+        .subscribeBy(
+            onNext = {
+                println("onNext() - execute")
+                print("$it ")
+                println()
+            }
+        )
+}
+
+/* scan */
+fun testScan() {
+    val observable = Observable.just("오", "징", "어", "게", "임")
+        .scan { t1, t2 -> t1 + t2 }
+        .subscribe {
+            println(it)
+        }
+}
