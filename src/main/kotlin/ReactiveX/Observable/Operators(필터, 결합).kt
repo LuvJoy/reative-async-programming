@@ -1,0 +1,64 @@
+package ReactiveX.Observable
+
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.subjects.BehaviorSubject
+import java.util.concurrent.TimeUnit
+
+fun main() {
+}
+
+/* debounce */
+fun testDebounce() {
+    val observable = Observable.create<Int> { observable ->
+        repeat(10) {
+            observable.onNext(it)
+            if (it % 2 == 0) Thread.sleep(1000L)
+        }
+    }.debounce(500L, TimeUnit.MICROSECONDS)
+
+    observable.subscribe {
+        println(it)
+    }
+}
+
+/* distinct */
+fun testDistinct() {
+    val observable = Observable.just("A", "B", "C", "D", "A", "B", "C")
+        .distinct()
+        .subscribe { println(it) }
+}
+
+/* sample */
+fun testSample() {
+    Observable.interval(1, TimeUnit.SECONDS)
+        .sample(2, TimeUnit.SECONDS)
+        .subscribe { println(it) }
+
+    Thread.sleep(10000L)
+}
+
+/* skip */
+fun testSkip() {
+    Observable.just(1,2,3,4,5)
+        .skip(2)
+        .subscribe { println(it) }
+}
+
+/* take */
+fun testTake() {
+    Observable.just(1,2,3,4,5)
+        .take(2)
+        .subscribe { println(it) }
+}
+
+/* all */
+fun testAll() {
+    Observable.just("John", "James", "Joseph", "Kim")
+        .all { it.startsWith('J') }
+        .subscribeBy { println("[Are Names StartWith J?] : $it") }
+
+    Observable.just("John", "James", "Joseph", "Jim")
+        .all { it.startsWith('J') }
+        .subscribeBy { println("[Are Names StartWith J?] : $it") }
+}
