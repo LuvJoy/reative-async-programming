@@ -6,6 +6,7 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.util.concurrent.TimeUnit
 
 fun main() {
+    testZip()
 }
 
 /* debounce */
@@ -61,4 +62,61 @@ fun testAll() {
     Observable.just("John", "James", "Joseph", "Jim")
         .all { it.startsWith('J') }
         .subscribeBy { println("[Are Names StartWith J?] : $it") }
+}
+
+/* combineLatest */
+fun testCombineLatest() {
+    val numbers = Observable.create<Int> { emitter ->
+        Thread {
+            repeat(5) { age ->
+                emitter.onNext(age)
+                Thread.sleep(1000L)
+            }
+        }.start()
+    }
+
+    val names = Observable.create<String> { emiiter ->
+        Thread {
+            Thread.sleep(300L)
+            emiiter.onNext("James")
+            Thread.sleep(500L)
+            emiiter.onNext("Jim")
+            Thread.sleep(200L)
+            emiiter.onNext("Joseph")
+            Thread.sleep(200L)
+            emiiter.onNext("Kelly")
+        }.start()
+    }
+
+    Observable.combineLatest(numbers, names) { number, name -> "[$number] - $name" }
+        .subscribe { println(it) }
+}
+
+
+/* zip */
+fun testZip() {
+    val numbers = Observable.create<Int> { emitter ->
+        Thread {
+            repeat(5) { age ->
+                emitter.onNext(age)
+                Thread.sleep(1000L)
+            }
+        }.start()
+    }
+
+    val names = Observable.create<String> { emiiter ->
+        Thread {
+            Thread.sleep(300L)
+            emiiter.onNext("James")
+            Thread.sleep(500L)
+            emiiter.onNext("Jim")
+            Thread.sleep(200L)
+            emiiter.onNext("Joseph")
+            Thread.sleep(200L)
+            emiiter.onNext("Kelly")
+        }.start()
+    }
+
+    Observable.zip(numbers, names) { number, name -> "[$number] - $name" }
+        .subscribe { println(it) }
 }
