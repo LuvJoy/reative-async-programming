@@ -6,7 +6,7 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.util.concurrent.TimeUnit
 
 fun main() {
-    testZip()
+    testMergeCase1()
 }
 
 /* debounce */
@@ -41,14 +41,14 @@ fun testSample() {
 
 /* skip */
 fun testSkip() {
-    Observable.just(1,2,3,4,5)
+    Observable.just(1, 2, 3, 4, 5)
         .skip(2)
         .subscribe { println(it) }
 }
 
 /* take */
 fun testTake() {
-    Observable.just(1,2,3,4,5)
+    Observable.just(1, 2, 3, 4, 5)
         .take(2)
         .subscribe { println(it) }
 }
@@ -119,4 +119,38 @@ fun testZip() {
 
     Observable.zip(numbers, names) { number, name -> "[$number] - $name" }
         .subscribe { println(it) }
+}
+
+/* merge */
+fun testMergeCase1() {
+    val numberObservable = Observable.create<String> { emitter ->
+        Thread {
+            repeat(10) {
+                emitter.onNext("$it")
+                Thread.sleep(1000L)
+            }
+        }.start()
+    }
+    val nameObservable = Observable.fromIterable(listOf("John", "James", "Molly", "Holly", "Kimchi"))
+
+    Observable.merge(numberObservable, nameObservable)
+        .subscribeBy {
+            println(it)
+        }
+
+    Observable.mergeArray(numberObservable, nameObservable)
+        .subscribe {
+            println(it)
+        }
+}
+
+/* merge */
+fun testMergeCase2() {
+    val numberObservable = Observable.just(1, 2, 3, 4, 5)
+    val nameObservable = Observable.fromIterable(listOf("John", "James", "Molly", "Holly", "Kimchi"))
+
+    Observable.merge(numberObservable, nameObservable)
+        .subscribe {
+            println(it)
+        }
 }
