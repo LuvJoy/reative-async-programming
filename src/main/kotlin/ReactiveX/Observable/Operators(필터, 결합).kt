@@ -6,7 +6,7 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.util.concurrent.TimeUnit
 
 fun main() {
-    testMergeCase1()
+    testThrottleFirst()
 }
 
 /* debounce */
@@ -21,6 +21,32 @@ fun testDebounce() {
     observable.subscribe {
         println(it)
     }
+}
+
+/* throttleFirst */
+fun testThrottleFirst() {
+    val observable = Observable.create<Int> { emitter ->
+        Thread {
+            repeat(10) {
+                emitter.onNext(it)
+                Thread.sleep(50)
+            }
+        }.start()
+    }.throttleFirst(100L, TimeUnit.MILLISECONDS)
+        .subscribe { println(it) }
+}
+
+/* throttleLast */
+fun testThrottleLast() {
+    val observable = Observable.create<Int> { emitter ->
+        Thread {
+            repeat(10) {
+                emitter.onNext(it)
+                Thread.sleep(50)
+            }
+        }.start()
+    }.throttleLast(100L, TimeUnit.MILLISECONDS)
+        .subscribe { println(it) }
 }
 
 /* distinct */
